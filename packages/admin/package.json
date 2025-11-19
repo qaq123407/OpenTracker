@@ -7,7 +7,7 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "mock": "json-server --watch mock/db.json --port 3001 --middlewares mock/auth-middleware.js"
+    "mock": "json-server --watch mock/db.json --port 3001"
   },
   "keywords": [
     "tracker",
