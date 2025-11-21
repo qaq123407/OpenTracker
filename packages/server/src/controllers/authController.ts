@@ -8,6 +8,11 @@ const users: any[] = []
 let userIdCounter = 1
 
 class AuthController {
+  constructor() {
+    // 绑定方法到当前实例
+    this.register = this.register.bind(this)
+    this.login = this.login.bind(this)
+  }
   // 用户注册
   async register(ctx: Context): Promise<void> {
     const { username, password } = ctx.request.body as IRegisterRequest
