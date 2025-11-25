@@ -7,7 +7,6 @@ import {
   Input,
   Select,
   Space,
-  Tabs,
   DatePicker,
   Breadcrumb,
   Button,
@@ -27,9 +26,6 @@ import {
   LineChartOutlined,
   TabletOutlined,
   ContactsOutlined,
-  CalendarOutlined,
-  TeamOutlined,
-  AppstoreAddOutlined,
   CloseCircleOutlined,
 } from '@ant-design/icons'
 import { useNavigate } from 'react-router-dom'
@@ -38,39 +34,8 @@ import { removeToken } from '@/utils/token'
 const { Header, Content, Footer, Sider } = Layout
 const { Title } = Typography
 const { RangePicker } = DatePicker
-const { TabPane } = Tabs
 
 type MenuItem = Required<MenuProps>['items'][number]
-
-const navItems: MenuItem[] = [
-  {
-    key: 'nav1',
-    icon: <CalendarOutlined />,
-    label: '日期',
-    children: [
-      { key: 'nav11', label: 'option 1' },
-      { key: 'nav12', label: 'option 2' },
-    ],
-  },
-  {
-    key: 'nav2',
-    icon: <TeamOutlined />,
-    label: '所有的访问',
-    children: [
-      { key: 'nav21', label: 'option 1' },
-      { key: 'nav22', label: 'option 2' },
-    ],
-  },
-  {
-    key: 'nav3',
-    icon: <AppstoreAddOutlined />,
-    label: '报表面板',
-    children: [
-      { key: 'nav31', label: 'option 1' },
-      { key: 'nav32', label: 'option 2' },
-    ],
-  },
-]
 
 const subItems: MenuItem[] = [
   {
@@ -140,11 +105,9 @@ const subItems: MenuItem[] = [
 
 const AuthenticatedApp: React.FC = () => {
   const [currentKey, setCurrentKey] = useState('sub1')
-  const [currentNav, setCurrentNav] = useState('nav3')
   const navigate = useNavigate()
   const [showSearch, setShowSearch] = useState(false)
   const [searchValue, setSearchValue] = useState('')
-  const [selectedMenuItem, setSelectedMenuItem] = useState('1') // 添加状态跟踪选中的菜单项
   const {
     token: { colorBgContainer, borderRadiusLG },
   } = theme.useToken()
@@ -156,10 +119,6 @@ const AuthenticatedApp: React.FC = () => {
 
   const onMenuClick: MenuProps['onClick'] = (e) => {
     setCurrentKey(e.key)
-  }
-
-  const onNavClick: MenuProps['onClick'] = (e) => {
-    setCurrentNav(e.key)
   }
 
   const handleSearchToggle = () => {
@@ -178,19 +137,6 @@ const AuthenticatedApp: React.FC = () => {
     setShowSearch(false)
     setSearchValue('')
   }
-  const userMenu = (
-    <Menu>
-      <Menu.Item key="1" icon={<UserOutlined />}>
-        个人中心
-      </Menu.Item>
-      <Menu.Item key="2" icon={<SettingOutlined />}>
-        账户设置
-      </Menu.Item>
-      <Menu.Item key="3" danger onClick={handleLogout}>
-        退出登录
-      </Menu.Item>
-    </Menu>
-  )
   return (
     <Layout style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
       <Header
@@ -218,15 +164,15 @@ const AuthenticatedApp: React.FC = () => {
             <Button type="text">数据概览</Button>
             {/* 事件管理下拉菜单 */}
             <Dropdown
-              overlay={
-                <Menu>
-                  <Menu.Item key="1">1</Menu.Item>
-                  <Menu.Item key="2">2</Menu.Item>
-                  <Menu.Item key="3">3</Menu.Item>
-                  <Menu.Item key="4">4</Menu.Item>
-                  <Menu.Item key="5">5</Menu.Item>
-                </Menu>
-              }
+              menu={{
+                items: [
+                  { key: '1', label: '1' },
+                  { key: '2', label: '2' },
+                  { key: '3', label: '3' },
+                  { key: '4', label: '4' },
+                  { key: '5', label: '5' },
+                ],
+              }}
               placement="bottomLeft"
             >
               <Button type="text">事件管理</Button>
@@ -275,7 +221,20 @@ const AuthenticatedApp: React.FC = () => {
           </Badge>
 
           {/* 用户信息 */}
-          <Dropdown overlay={userMenu} placement="bottomRight">
+          <Dropdown
+            menu={{
+              items: [
+                { key: '1', label: <span>个人中心</span>, icon: <UserOutlined /> },
+                { key: '2', label: <span>账户设置</span>, icon: <SettingOutlined /> },
+                {
+                  key: '3',
+                  label: <span style={{ color: '#ff4d4f' }}>退出登录</span>,
+                  onClick: handleLogout,
+                },
+              ],
+            }}
+            placement="bottomRight"
+          >
             <Space style={{ cursor: 'pointer' }}>
               <Avatar icon={<UserOutlined />} />
               <span>管理员</span>
