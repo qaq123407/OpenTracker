@@ -1,9 +1,16 @@
 import React, { useState } from 'react'
 import type { MenuProps } from 'antd'
 import { Breadcrumb, Layout, theme } from 'antd'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, Route, Routes } from 'react-router-dom'
 import HeaderComponent from '@/components/header'
 import SiderComponent from '@/components/sider'
+import DashboardPage from '@/screens/dashboard'
+import VisitorPage from '@/screens/visitor'
+import BehaviorPage from '@/screens/behavior'
+import CustomerPage from '@/screens/customer'
+import ErrorPage from '@/screens/error'
+import PerformancePage from '@/screens/performance'
+import BlankPage from '@/screens/blank'
 
 const { Content, Footer } = Layout
 
@@ -16,6 +23,20 @@ const AuthenticatedApp: React.FC = () => {
 
   const onMenuClick: MenuProps['onClick'] = (e) => {
     setCurrentKey(e.key)
+    // 根据菜单key导航到对应的路由
+    const routeMap: Record<string, string> = {
+      sub11: '/home/dashboard',
+      sub21: '/home/visitor',
+      sub31: '/home/behavior',
+      sub41: '/home/customer',
+      sub51: '/home/error',
+      sub61: '/home/performance',
+      sub71: '/home/blank',
+    }
+    const route = routeMap[e.key]
+    if (route) {
+      navigate(route)
+    }
   }
   return (
     <Layout style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
@@ -39,7 +60,17 @@ const AuthenticatedApp: React.FC = () => {
             onMenuClick={onMenuClick}
             colorBgContainer={colorBgContainer}
           />
-          <Content style={{ padding: '0 24px', maxHeight: 684, overflow: 'auto' }}></Content>
+          <Content style={{ padding: '0 24px', maxHeight: 684, overflow: 'auto' }}>
+            <Routes>
+              <Route path="dashboard" element={<DashboardPage />} />
+              <Route path="visitor" element={<VisitorPage />} />
+              <Route path="behavior" element={<BehaviorPage />} />
+              <Route path="customer" element={<CustomerPage />} />
+              <Route path="error" element={<ErrorPage />} />
+              <Route path="performance" element={<PerformancePage />} />
+              <Route path="blank" element={<BlankPage />} />
+            </Routes>
+          </Content>
         </Layout>
       </div>
       <Footer style={{ textAlign: 'center' }}>
