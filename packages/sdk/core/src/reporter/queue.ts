@@ -1,6 +1,6 @@
-import { EventTypes } from '../../../common'
-import { Transport } from './transport'
-import { TrackEvent, QueueConfig } from '../../../types/src/core/config'
+import { EventTypes } from '../../../common/index.js'
+import { Transport } from './transport.js'
+import { TrackEvent, QueueConfig } from '../../../types/src/core/config.js'
 
 // 默认队列配置
 const DEFAULT_QUEUE_CONFIG: Omit<QueueConfig, 'apiKey' | 'serverUrl'> = {

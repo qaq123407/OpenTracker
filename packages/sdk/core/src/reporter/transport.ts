@@ -1,6 +1,6 @@
-import { TrackEvent, TransportConfig } from '../../../types/src/core/config'
-import { ReportStrategy } from '../../../common'
-import { Retryer } from './retry'
+import { TrackEvent, TransportConfig } from '../../../types/src/core/config.js'
+import { ReportStrategy } from '../../../common/index.js'
+import { Retryer } from './retry.js'
 
 // 转换事件类型
 const transformEventType = (eventType: string): string => {

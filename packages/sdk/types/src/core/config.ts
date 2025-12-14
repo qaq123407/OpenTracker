@@ -1,5 +1,5 @@
-import { EventTypes } from '../../../common'
-import { ApiMonitorOptions } from '../plugins/api-error'
+import { EventTypes } from '../../../common/index.js'
+import { ApiMonitorOptions } from '../plugins/api-error.js'
 
 export interface OpenTrackerConfig {
   apiKey: string

@@ -1,5 +1,5 @@
-import { TrackEvent, RetryConfig, StorageConfig } from '../../../types/src/core/config'
-import { Transport } from './transport'
+import { TrackEvent, RetryConfig, StorageConfig } from '../../../types/src/core/config.js'
+import { Transport } from './transport.js'
 
 // 默认重试配置
 const DEFAULT_RETRY_CONFIG: RetryConfig = {
