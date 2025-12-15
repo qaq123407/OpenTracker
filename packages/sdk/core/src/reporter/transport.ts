@@ -1,18 +1,42 @@
-import { TrackEvent, TransportConfig } from '../../../types/src/core/config'
-import { ReportStrategy } from '../../../common'
-import { Retryer } from './retry'
+import { TrackEvent, TransportConfig } from '../../../types/src/core/config.js'
+import { ReportStrategy } from '../../../common/index.js'
+import { Retryer } from './retry.js'
+
+// 转换事件类型
+const transformEventType = (eventType: string): string => {
+  if (eventType === 'white_screen') {
+    return 'blank'
+  }
+  return eventType
+}
+
+// 格式化单个事件数据
+const formatEventForServer = (event: TrackEvent): { type: string; data: any } => {
+  return {
+    type: transformEventType(event.type),
+    data: {
+      ...event.data,
+      timestamp: event.timestamp || Date.now(),
+      apiKey: event.data._apiKey || '',
+      eventName: event.event,
+    },
+  }
+}
 
 // 通过sendBeacon上报：页面卸载优先，无阻塞，支持跨域
 const reportByBeacon = (serverUrl: string, events: TrackEvent[]): boolean => {
   try {
-    const payload = JSON.stringify({
-      events,
-      timestamp: Date.now(),
-      apiKey: events[0]?.data?._apiKey || '', // 携带项目ID
-    })
-    const blob = new Blob([payload], { type: 'application/json; charset=utf-8' })
-    // sendBeacon返回布尔值，表示是否成功加入浏览器发送队列
-    return navigator.sendBeacon(serverUrl, blob)
+    //循环发送每个事件
+    for (const event of events) {
+      const payload = JSON.stringify(formatEventForServer(event))
+      const blob = new Blob([payload], { type: 'application/json; charset=utf-8' })
+      // sendBeacon返回布尔值，表示是否成功加入浏览器发送队列
+      const success = navigator.sendBeacon(serverUrl, blob)
+      if (!success) {
+        return false
+      }
+    }
+    return true
   } catch (error) {
     console.error(`[Transports:Beacon] 上报异常：${(error as Error).message}`)
     return false
@@ -21,29 +45,28 @@ const reportByBeacon = (serverUrl: string, events: TrackEvent[]): boolean => {
 
 // 通过XHR上报：可控性强，支持复杂数据和重试，支持跨域
 const reportByXHR = (serverUrl: string, events: TrackEvent[]): Promise<boolean> => {
-  return new Promise((resolve) => {
-    const xhr = new XMLHttpRequest()
-    xhr.open('POST', serverUrl, true)
-    xhr.setRequestHeader('Content-Type', 'application/json; charset=utf-8')
-
-    // 上报成功回调
-    xhr.onload = () => {
-      resolve(xhr.status >= 200 && xhr.status < 300)
-    }
-
-    // 网络异常回调
-    xhr.onerror = () => {
+  return new Promise(async (resolve) => {
+    try {
+      // 循环发送每个事件
+      for (const event of events) {
+        const payload = formatEventForServer(event)
+        const response = await fetch(serverUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json; charset=utf-8',
+          },
+          body: JSON.stringify(payload),
+        })
+        if (!response.ok) {
+          resolve(false)
+          return
+        }
+      }
+      resolve(true)
+    } catch (error) {
+      console.error(`[Transports:XHR] 上报异常：${(error as Error).message}`)
       resolve(false)
     }
-
-    // 发送数据
-    xhr.send(
-      JSON.stringify({
-        events,
-        timestamp: Date.now(),
-        apiKey: events[0]?.data?._apiKey || '',
-      })
-    )
   })
 }
 
@@ -51,28 +74,28 @@ const reportByXHR = (serverUrl: string, events: TrackEvent[]): Promise<boolean> 
 const reportByIMG = (serverUrl: string, events: TrackEvent[]): Promise<boolean> => {
   return new Promise((resolve) => {
     try {
-      // IMG仅支持GET，需将数据转成URL参数
-      const payload = encodeURIComponent(
-        JSON.stringify({
-          events,
-          timestamp: Date.now(),
-          apiKey: events[0]?.data?._apiKey || '',
-        })
-      )
-      const img = new Image()
+      //循环发送每个事件
+      let successCount = 0
+      const totalEvents = events.length
 
-      // 上报成功
-      img.onload = () => {
-        resolve(true)
+      const onLoadOrError = () => {
+        successCount++
+        if (successCount === totalEvents) {
+          resolve(true)
+        }
       }
 
-      // 上报失败
-      img.onerror = () => {
-        resolve(false)
-      }
+      for (const event of events) {
+        const payload = encodeURIComponent(JSON.stringify(formatEventForServer(event)))
+        const img = new Image()
 
-      // 触发上报
-      img.src = `${serverUrl}?data=${payload}`
+        // 上报成功或失败都计数
+        img.onload = onLoadOrError
+        img.onerror = onLoadOrError
+
+        // 触发上报
+        img.src = `${serverUrl}?data=${payload}`
+      }
     } catch (error) {
       console.error(`[Transports:IMG] 上报异常：${(error as Error).message}`)
       resolve(false)

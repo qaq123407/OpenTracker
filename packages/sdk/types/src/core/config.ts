@@ -1,5 +1,5 @@
-import { EventTypes } from '../../../common'
-import { ApiMonitorOptions } from '../plugins/api-error'
+import { EventTypes } from '../../../common/index.js'
+import { ApiMonitorOptions } from '../plugins/api-error.js'
 
 export interface OpenTrackerConfig {
   apiKey: string
@@ -32,6 +32,13 @@ export interface QueueConfig extends OpenTrackerConfig {
   immediateMaxSize: number // 立即队列最大容量
   batchMaxSize: number // 批量队列最大容量
   debug: boolean // 调试模式
+}
+
+// 本地存储配置项
+export interface StorageConfig {
+  enabled?: boolean // 是否启用本地存储
+  maxSize?: number // 最大存储事件数
+  maxAge?: number // 数据最大保存时间（ms）
 }
 
 // 重试配置项

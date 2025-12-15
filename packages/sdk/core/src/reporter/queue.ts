@@ -1,6 +1,6 @@
-import { EventTypes } from '../../../common'
-import { Transport } from './transport'
-import { TrackEvent, QueueConfig } from '../../../types/src/core/config'
+import { EventTypes } from '../../../common/index.js'
+import { Transport } from './transport.js'
+import { TrackEvent, QueueConfig } from '../../../types/src/core/config.js'
 
 // 默认队列配置
 const DEFAULT_QUEUE_CONFIG: Omit<QueueConfig, 'apiKey' | 'serverUrl'> = {
@@ -126,7 +126,12 @@ export class QueueManager {
       event: eventName,
       type: eventType,
       timestamp: Date.now(),
-      data: { ...data, _apiKey: this.config.apiKey, _trackTime: Date.now() }, // 补充项目ID和追踪时间
+      data: {
+        ...data,
+        _apiKey: this.config.apiKey,
+        _serverUrl: this.config.serverUrl,
+        _trackTime: Date.now(),
+      }, // 补充项目ID、服务器URL和追踪时间
     }
     if (this.userId) {
       result.userId = this.userId

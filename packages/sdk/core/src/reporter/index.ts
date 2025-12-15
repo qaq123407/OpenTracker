@@ -1,7 +1,7 @@
-import { EventTypes } from '../../../common'
-import { QueueManager } from './queue'
-import { TrackerConfig, QueueConfig } from '../../../types/src/core/config'
-import { WhiteScreenInfo } from '../../../types/src/plugins/white-screen'
+import { EventTypes } from '../../../common/index.js'
+import { QueueManager } from './queue.js'
+import { TrackerConfig, QueueConfig } from '../../../types/src/core/config.js'
+import { WhiteScreenInfo } from '../../../types/src/plugins/white-screen.js'
 
 export class Tracker {
   private static instance: Tracker
